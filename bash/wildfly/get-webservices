@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# Reads and saves the webservices.
+#
+# This script uses jboss-cli to read the webservices, which are
+# installed. The name
+# and the WSDL-URL are written to a file. This script requires the outfile 
+# and subdeployment as arguments. 
+# It is recommend to start this script with the helper
+# script start-get-webservices.
+# 
+# Author: David Mittelstaedt <david.mittelstaedt@dataport.de>
+# Date: 2017-10-02 
+#
+#==============================================================================
+
+# Name or ip of the host
+HOST=$1
+
+# Port offset of the wildfly instance
+PORT_OFFSET=$2
+
+# Port for the admin interface of the instance
+ADMIN_PORT=$((9990 + $PORT_OFFSET))
+
+# JBoss home directory
+JBOSS_HOME=$3
+
+# File to save the webservices
+OUTFILE=$4
+
+# Deployment of the application
+DEPLOYMENT=$5
+
+# Subdeployment of the deployment
+SUBDEPLOYMENT=$6
+
+# Temporary file to save cli commands
+CLI_TEMP=webservices-commands.cli
+
+# Temporary file to save cli output
+OUT_TEMP=webservices.tmp
+
+export JBOSS_HOME=$JBOSS_HOME
+
+if [ -f $OUTFILE ]; then
+  > $OUTFILE
+fi
+
+if [ -f $CLI_TEMP ]; then
+  rm -f $CLI_TEMP
+fi
+
+if [ -f $OUT_TEMP ]; then
+  rm -f $OUT_TEMP
+fi
+
+# Save all webservices to a variable
+websrv_internal="$($JBOSS_HOME/bin/jboss-cli.sh --controller=$HOST:$ADMIN_PORT --connect --command="/deployment=deployment.ear/subdeployment=$SUBDEPLOYMENT/subsystem=webservices:read-resource(include-runtime=true)")"
+
+# Write content of the variable to an array
+read -r -a array <<< $websrv_internal
+
+
+# Declare a new empty array
+webservices_array=()
+
+# Read only the elements from the array with substring services and save these result to the new array
+for element in "${array[@]}"
+do
+  if [[ $element == *"services"* ]]; then
+  element=("${element//\"}")
+  webservices_array+=($element) 
+  fi
+done
+
+# Sort webservices alphabetical
+webservice_array_sorted=( $(
+  for ws in "${webservices_array[@]}"
+  do
+    echo "$ws"
+  done | sort) )
+
+# TODO: Compare array length before and after sort to avoid errors
+echo "Anzahl: ${#webservice_array_sorted[@]}" >> $OUTFILE 
+echo >> $OUTFILE
+
+for webservice in "${webservice_array_sorted[@]}"
+do
+  # Print name of the webservice
+  echo "/deployment=deployment.ear/subdeployment=$SUBDEPLOYMENT/subsystem=webservices/endpoint=$webservice:read-attribute(name=name)" >> $CLI_TEMP
+  # Print url of the webservice
+  echo "/deployment=deployment.ear/subdeployment=$SUBDEPLOYMENT/subsystem=webservices/endpoint=$webservice:read-attribute(name=wsdl-url)" >> $CLI_TEMP
+done
+
+# JBoss cli non-interacitve mode, commands are stored in separete file
+$JBOSS_HOME/bin/jboss-cli.sh --controller=$HOST:$ADMIN_PORT --connect --file=$CLI_TEMP >> $OUT_TEMP
+
+# Parsing cli output
+while read -r line
+do
+  if [[ $line == *"result"* ]]; then
+    line=${line##*>}
+    line=$(echo $line | tr -d \" | tr -d } | tr -d { )
+    if [[ $line == *"http"* ]]; then
+      echo "URL : $line" >> $OUTFILE 
+      echo >> $OUTFILE
+    else
+      echo "Name: $line" >> $OUTFILE
+    fi
+  fi
+done <$OUT_TEMP
+
+# Clean up
+rm -rf $CLI_TEMP $OUT_TEMP
+
+exit 0

@@ -9,7 +9,7 @@
 # Full path to the instance directory
 JBOSS_BASE_DIR=/opt/wildfly-8.2.1.Final/standalone
 # Ip address
-IP_ADDRESS=10.62.84.209
+IP_ADDRESS=10.0.0.1
 # Port offset
 PORT_OFFSET=1000
 

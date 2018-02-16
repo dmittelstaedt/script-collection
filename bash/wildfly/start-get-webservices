@@ -1,0 +1,36 @@
+#!/bin/bash
+# 
+# A little helper script to start the script get-webservices.
+#
+# This script start the script get-webservices with the arguments for the
+# outfile and the subdeployment. Uses tail to monitor the outfile and writes 
+# a log file.
+#
+# Author: David Mittelstaedt <david.mittelstaedt@dataport.de>
+# Date: 2017-10-02
+# 
+#==============================================================================
+
+# Name or ip of the host
+HOST=10.0.0.1
+
+# Port offset of the wildfly instance
+PORT_OFFSET=1000
+
+# JBoss home directory
+JBOSS_HOME=/opt/wildfly-8.2.0.Final
+
+# File to save the webservices
+OUTFILE=/opt/kidicap/webservices.txt
+
+# Deployment of the application
+DEPLOYMENT=deployment.ear
+
+# Subdeployment of the deployment
+SUBDEPLOYMENT=subdeployment.jar
+
+touch $OUTFILE
+nohup get-webservices $HOST $PORT_OFFSET $JBOSS_HOME $OUTFILE $DEPLOYMENT $SUBDEPLOYMENT > get-webservices.log &
+tail -f $OUTFILE
+
+exit 0

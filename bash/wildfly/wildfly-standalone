@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Starts, stops and monitors wildfly for comand-ui and admin.
+#
+# Author: David Mittelstaedt  <david.mittelstaedt@dataport.de>
+# Date: 2017-11-23
+
+# Set variables
+# Full path to the instance directory
+JBOSS_BASE_DIR=/opt/wildfly-8.2.1.Final/standalone
+# Ip address
+IP_ADDRESS=10.62.84.209
+# Port offset
+PORT_OFFSET=1000
+
+gen-wildfly $JBOSS_BASE_DIR $IP_ADDRESS $PORT_OFFSET $1
+
+exit $?

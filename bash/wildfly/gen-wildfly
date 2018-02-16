@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# Starts, stops and monitors wildfly instances.
+#
+# Requires the three arguments WildFly base directory, port offset and
+# start/stop/status.
+# These arguments can be set permanently e.g. in the .basrc.
+#
+# Author: David Mittelstaedt  <david.mittelstaedt@dataport.de>
+# Date: 2017-09-19
+
+# Set variables
+JBOSS_BASE_DIR=$1
+
+# Get jboss home from base dir
+JBOSS_HOME=(${JBOSS_BASE_DIR%/*})
+IP_ADDRESS=$2
+PORT_OFFSET=$3
+adminport=$((9990 + $PORT_OFFSET))
+JAVAC_LOG=$JBOSS_BASE_DIR/log/SysOut.log
+
+export JBOSS_HOME=$JBOSS_HOME
+
+case "$4" in
+  start)
+    echo "Starting WildFly KIDICAP $PORT_OFFSET"
+    $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect --command=":read-attribute(name=server-state)" > /dev/null 2>&1
+    if [ $? != 0 ]; then
+      > $JAVAC_LOG
+      nohup $JBOSS_HOME/bin/standalone.sh -Djboss.server.base.dir=$JBOSS_BASE_DIR -Djboss.socket.binding.port-offset=$PORT_OFFSET >$JAVAC_LOG 2>&1 &
+      tail -f $JAVAC_LOG
+      else
+        echo "WildFly KIDICAP $PORT_OFFSET is already running"
+      fi
+      ;;
+  stop)
+    echo "Shutting down WildFly KIDICAP $PORT_OFFSET"
+    $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect :shutdown
+    ;;
+  status)
+    echo "Checking for service WildFly KIDICAP $PORT_OFFSET"
+    $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect --command=":read-attribute(name=server-state)" #> /dev/null 2>&1
+    ;;
+  *)
+    echo "Usage: $0 {jboss base direcotry} {ip address} {port offset} {start|stop|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

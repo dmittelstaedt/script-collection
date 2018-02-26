@@ -36,15 +36,15 @@ case "$4" in
   stop)
     echo "Shutting down WildFly KIDICAP $PORT_OFFSET"
     $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect :shutdown
+    exit $?
     ;;
   status)
     echo "Checking for service WildFly KIDICAP $PORT_OFFSET"
     $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect --command=":read-attribute(name=server-state)" #> /dev/null 2>&1
+    exit $?
     ;;
   *)
     echo "Usage: $0 {jboss base direcotry} {ip address} {port offset} {start|stop|status}"
     exit 1
     ;;
 esac
-
-exit 0

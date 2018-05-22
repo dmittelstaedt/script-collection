@@ -12,7 +12,9 @@ JBOSS_BASE_DIR=/opt/wildfly-8.2.1.Final/standalone
 IP_ADDRESS=127.0.0.1
 # Port offset
 PORT_OFFSET=1000
+# Current directory
+CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-gen-wildfly $JBOSS_BASE_DIR $IP_ADDRESS $PORT_OFFSET $1
+$CURRENT_DIR/gen-wildfly $JBOSS_BASE_DIR $IP_ADDRESS $PORT_OFFSET $1
 
 exit $?

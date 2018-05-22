@@ -3,46 +3,56 @@
 # Starts, stops and monitors apache tomcat
 #
 # Author: David Mittelstaedt  <david.mittelstaedt@dataport.de>
-# Date: 2017-09-19
+# Date: 2018-05-22
+RC=1
+
+if [ -z ${CATALINA_HOME+x} ]; then
+  echo "CATALINA_HOME is not set."
+  exit 1
+fi
 
 if [ ! -d $CATALINA_HOME ]; then
-   echo "Apache Tomcat is not installed properly."
-   exit 1
+  echo "Apache Tomcat is not installed properly."
+  exit 1
 fi
 
 case "$1" in
   start)
-        echo "Starting Apache Tomcat "
-        pid=`ps axww | grep org.apache.catalina.startup.Bootstrap | grep -v grep | awk '{print $1}'`
-        if [ ! -z $pid ]; then
-            echo "Apache Tomcat is already running"
-            exit 1
-        else
-            $CATALINA_HOME/bin/startup.sh #>/dev/null 2>&1
-            exit 0
-        fi
-        ;;
+    echo "Starting Apache Tomcat"
+    pid=`ps axww | grep org.apache.catalina.startup.Bootstrap | grep -v grep | awk '{print $1}'`
+    if [ ! -z $pid ]; then
+      echo "Apache Tomcat is already running"
+      RC=1
+    else
+      $CATALINA_HOME/bin/startup.sh
+      RC=$?
+    fi
+    ;;
   stop)
-        echo "Shutting down Apache Tomcat "
-        $CATALINA_HOME/bin/shutdown.sh #>/dev/null 2>&1
-        ;;
+    echo "Shutting down Apache Tomcat"
+    $CATALINA_HOME/bin/shutdown.sh
+    RC=$?
+    ;;
   restart)
-        $0 stop
-        $0 start
-        ;;
+    $0 stop
+    $0 start
+    RC=$?
+    ;;
   status)
-        echo "Checking for service Apache Tomcat "
-        i=`ps axww | grep org.apache.catalina.startup.Bootstrap | grep -v grep | wc -l`
-        if test $i = 0; then
-             echo "Apache Tomcat is not running"
-             exit 1
-        else
-             echo "Apache Tomcat is running"
-             exit 0
-        fi
-        ;;
+    echo "Checking for service Apache Tomcat"
+    i=`ps axww | grep org.apache.catalina.startup.Bootstrap | grep -v grep | wc -l`
+    if test $i = 0; then
+      echo "Apache Tomcat is not running"
+      RC=1
+    else
+      echo "Apache Tomcat is running"
+      RC=0
+    fi
+    ;;
   *)
-        echo "Usage: $0 {start|stop|status|restart}"
-        exit 1
-        ;;
+    echo "Usage: $0 {start|stop|status|restart}"
+    RC=1
+    ;;
 esac
+
+exit $RC

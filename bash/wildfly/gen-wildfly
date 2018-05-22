@@ -7,7 +7,8 @@
 # These arguments can be set permanently e.g. in the .basrc.
 #
 # Author: David Mittelstaedt  <david.mittelstaedt@dataport.de>
-# Date: 2017-09-19
+# Date: 2018-05-22
+RC=1
 
 # Set variables
 JBOSS_BASE_DIR=$1
@@ -17,9 +18,15 @@ JBOSS_HOME=(${JBOSS_BASE_DIR%/*})
 IP_ADDRESS=$2
 PORT_OFFSET=$3
 adminport=$((9990 + $PORT_OFFSET))
-JAVAC_LOG=$JBOSS_BASE_DIR/log/SysOut.log
+JAVAC_LOG_DIR=$JBOSS_BASE_DIR/log
+JAVAC_LOG=$JAVAC_LOG_DIR/SysOut.log
 
 export JBOSS_HOME=$JBOSS_HOME
+
+if [ ! -d $JAVAC_LOG_DIR ]; then
+  echo "Directory for logging doesn't exist."
+  exit 1
+fi 
 
 case "$4" in
   start)
@@ -28,23 +35,29 @@ case "$4" in
     if [ $? != 0 ]; then
       > $JAVAC_LOG
       nohup $JBOSS_HOME/bin/standalone.sh -Djboss.server.base.dir=$JBOSS_BASE_DIR -Djboss.socket.binding.port-offset=$PORT_OFFSET >$JAVAC_LOG 2>&1 &
-      tail -f $JAVAC_LOG
+      if [ ! -z ${WILDFLY_LOG+x} ] && [ "$WILDFLY_LOG" -eq 1 ]; then
+        tail -f $JAVAC_LOG
+      fi
+      RC=0
       else
         echo "WildFly KIDICAP $PORT_OFFSET is already running"
+        RC=1
       fi
       ;;
   stop)
     echo "Shutting down WildFly KIDICAP $PORT_OFFSET"
     $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect :shutdown
-    exit $?
+    RC=$?
     ;;
   status)
     echo "Checking for service WildFly KIDICAP $PORT_OFFSET"
-    $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect --command=":read-attribute(name=server-state)" #> /dev/null 2>&1
-    exit $?
+    $JBOSS_HOME/bin/jboss-cli.sh --controller=$IP_ADDRESS:$adminport --connect --command=":read-attribute(name=server-state)"
+    RC=$?
     ;;
   *)
     echo "Usage: $0 {jboss base direcotry} {ip address} {port offset} {start|stop|status}"
-    exit 1
+    RC=1
     ;;
 esac
+
+exit $RC

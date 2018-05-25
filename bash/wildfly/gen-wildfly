@@ -35,7 +35,9 @@ case "$4" in
     if [ $? != 0 ]; then
       > $JAVAC_LOG
       nohup $JBOSS_HOME/bin/standalone.sh -Djboss.server.base.dir=$JBOSS_BASE_DIR -Djboss.socket.binding.port-offset=$PORT_OFFSET >$JAVAC_LOG 2>&1 &
-      if [ ! -z ${WILDFLY_LOG+x} ] && [ "$WILDFLY_LOG" -eq 1 ]; then
+      if [ ! -z ${5+x} ] && [ "$5" -eq "1" ]; then
+        :
+      else
         tail -f $JAVAC_LOG
       fi
       RC=0

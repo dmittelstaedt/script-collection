@@ -15,6 +15,6 @@ PORT_OFFSET=1000
 # Current directory
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-$CURRENT_DIR/gen-wildfly $JBOSS_BASE_DIR $IP_ADDRESS $PORT_OFFSET $1
+$CURRENT_DIR/gen-wildfly $JBOSS_BASE_DIR $IP_ADDRESS $PORT_OFFSET $1 $2
 
 exit $?

@@ -1,0 +1,3 @@
+dir/subdir/sub-sub-dir
+dir/second-subdir
+second-dir/sub-dir

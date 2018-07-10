@@ -24,8 +24,9 @@ case "$1" in
       echo "Apache Tomcat is already running"
       RC=1
     else
-      $CATALINA_HOME/bin/startup.sh
+      nohup $CATALINA_HOME/bin/startup.sh > $CATALINA_HOME/logs/console.out 2>&1
       RC=$?
+      [ $RC == 0 ] && echo "Apache Tomcat started successfully"
     fi
     ;;
   stop)

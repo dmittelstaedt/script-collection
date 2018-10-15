@@ -5,17 +5,17 @@
 # Requires one argument start/stop/status.
 #
 # Author: David Mittelstaedt  <david.mittelstaedt@dataport.de>
-# Date: 2017-10-26
+# Date: 2018-09-07
 
 # Set constant variables
 # Full path to apache base dir
-APACHE_BASE_DIR=/opt/apache-httpd-2.4.29
+APACHE_BASE_DIR=/opt/apache-httpd-2.4.34
 PORT=8080
 RC=1
 
 # Check status of Apache HTTPD. Return 0 if Apache HTTPD is running. Return 1 if not.
 check_status () {
-    is_port=$(netstat -tuln | grep 8081)
+    is_port=$(netstat -tuln | grep ${PORT})
     if [ ! -z "$is_port" ] && [ -f $APACHE_BASE_DIR/logs/httpd.pid ]; then
       return 0
     else

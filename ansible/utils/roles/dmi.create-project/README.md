@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+A brief description of the role goes here. The project structure is based on https://docs.python-guide.org/writing/structure/.
 
 Requirements
 ------------

@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  roles:
+    - role: dmi.create-project
+      project_base_dir: /home/david/Projects
+      project_name: sample
+      project_owner: david
+      project_group: users

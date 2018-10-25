@@ -1,0 +1,26 @@
+---
+# tasks file for dmi.create-project
+- name: Create directories for python project
+  file:
+    path: "{{ project_base_dir }}/{{ project_name }}/{{ item }}"
+    state: directory
+    owner: "{{ project_owner }}"
+    group: "{{ project_group }}"
+    mode: 0755
+  with_items:
+   - "{{ project_name }}"
+   - tests
+- name: Create files for python project
+  file:
+    path: "{{ project_base_dir }}/{{ project_name }}/{{ item }}"
+    state: touch
+    owner: "{{ project_owner }}"
+    group: "{{ project_group }}"
+    mode: 0640
+  with_items:
+    - .gitignore
+    - README.md
+    - LICENSE
+    - setup.py
+    - requirements.txt
+    - "{{ project_name }}/__init__.py"

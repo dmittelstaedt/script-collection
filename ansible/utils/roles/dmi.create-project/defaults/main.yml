@@ -1,0 +1,6 @@
+---
+# defaults file for dmi.create-project
+project_base_dir: /home/test-user
+project_name: sample-project
+project_owner: test-user
+project_group: users

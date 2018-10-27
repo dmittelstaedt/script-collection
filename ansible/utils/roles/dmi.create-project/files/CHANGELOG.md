@@ -12,11 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 ### Security
 
-## [0.1] - 2018-10-27
-### Added
-- Bash script for starting and stopping Apache Tomcat
-- Bash script for starting and stopping WildFly
-- Bash script for starting and stopping Apache HTTP Server
-- Ansible playbook for creating python project with definied structure
+## [1.0.0] - 2018-??-??
 
-[Unreleased]: https://github.com/dmittelstaedt/script-collection
+[Unreleased]: https://link-to-current-head

@@ -24,3 +24,11 @@
     - setup.py
     - requirements.txt
     - "{{ project_name }}/__init__.py"
+- name: Create CHANGELOG.md
+  copy:
+    src: CHANGELOG.md
+    dest: "{{ project_base_dir }}/{{ project_name }}/CHANGELOG.md"
+    owner: "{{ project_owner }}"
+    group: "{{ project_group }}"
+    mode: 0640
+  when: is_changelog

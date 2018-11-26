@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  roles:
+    - role: dmi.create-project
+      project_base_dir: /home/david/Projects/script-collection/python
+      project_name: normalize
+      project_owner: david
+      project_group: users
+      is_changelog: true

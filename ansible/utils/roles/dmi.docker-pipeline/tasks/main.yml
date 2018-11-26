@@ -1,0 +1,26 @@
+---
+# tasks file for dmi.docker-pipeline
+- set_fact:
+    container_id: "{{ ((name_of_container + ansible_date_time.iso8601 ) | hash('sha512')) [-20:] }}"
+- name: Build image from Dockerfile
+  docker_image:
+    path: "{{ path_to_dockerfile }}"
+    name: "{{ name_of_image }}"
+    state: present
+    force: yes
+- name: Run container from image
+  docker_container:
+    name: "{{ container_id }}"
+    image: dmi/normalize
+    state: started
+- name: Fetch output from container
+  shell: docker logs "{{ container_id }}"
+  register: container_output
+- name: Print output from container
+  debug:
+    msg: "{{ container_output.stdout_lines }}"
+- name: Cleanup container
+  docker_container:
+    name: "{{ container_id }}"
+    state: absent
+# name: Cleanup image

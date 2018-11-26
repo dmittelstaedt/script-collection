@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  roles:
+    - role: dmi.docker-pipeline
+      path_to_dockerfile: /home/david/Projects/script-collection/python/normalize
+      name_of_image: dmi/normalize
+      name_of_container: normalize-test

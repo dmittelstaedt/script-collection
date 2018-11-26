@@ -1,0 +1,5 @@
+---
+# defaults file for dmi.docker-pipeline
+path_to_dockerfile: /home/user/application
+name_of_image: repo/application-image
+name_of_container: application-test

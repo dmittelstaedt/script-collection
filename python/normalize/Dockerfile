@@ -7,6 +7,10 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+# Create test directory structure
+RUN bin/create-dirs.sh && \
+    bin/create-files.sh
+
 # Install any needed packages specified in requirements.txt
 #RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
@@ -16,5 +20,8 @@ COPY . /app
 # Define environment variable
 #ENV NAME World
 
+# Entrypoint for application
+Entrypoint ["python", "normalize/normalize.py"]
+
 # Run app.py when the container launches
-CMD ["python", "normalize/normalize.py"]
+#CMD ["python", "normalize/normalize.py"]

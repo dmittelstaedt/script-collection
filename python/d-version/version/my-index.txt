@@ -1,1 +1,0 @@
-<p class="small" style="margin-top: 2.5em;">Version 19.1.1 Update 5</p>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>KIDICAP ST Test</title>
+</head>
+<body>
+  <nav class="navbar navbar-toggleable-md navbar-inverse bg-faded">
+      <a class="navbar-brand" href="index.html">
+       <img src="res/dataport.gif" width="150" height="auto" alt="Dataport">
+       </a>
+  </nav>
+  <div class="container col-md-8 text-center" style="margin-top: 1em;">
+    <h3 style="color:#AD1E14; margin-bottom: 0.7em;">KIDICAP Sachsen Anhalt - Test</h3>
+    <div class="container col-md-5 text-center">
+      <div class="list-groups">
+        <a href="http://kidicap-st-gui-test.ad.lsa-net.de:8080/DB022/app/kidicap.jnlp"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD" >GUI Personalabrechnung DB022</a>
+        <a href="http://kidicap-st-gui-test.ad.lsa-net.de:8080/prognose/app/prognose.jnlp"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">GUI Prognose DB022</a>
+        <a href="http://kidicap-st-gui-test.ad.lsa-net.de:8080/vfe/app/vfe.jnlp"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">GUI Versorgunsfestsetzung DB022</a><br/>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9081/KIDICAP.Admin"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">KIDICAP Admin</a>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9081/KIDICAP.Comand"class="list-group-item list-group-item-action"list-group-item-light
+           style="color:#0645AD">KIDICAP Comand</a>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9081/KIDICAP.Meldungen"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">KIDICAP Meldungen</a><br/>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9083/gip-admin"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">KIDICAP Vorlagen Admin</a>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9083/gip-workspace"class="list-group-item list-group-item-action"list-group-item-light
+           style="color:#0645AD" >KIDICAP Vorlagen Workspace</a>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9083/gip-sdd"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD">KIDICAP Vorlagen SDD</a>
+        <a href="http://kidicap-st-apps-test.ad.lsa-net.de:9083/gip-designer"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD" >KIDICAP Vorlagen Designer</a><br/>
+        <p>
+        <a href="http://kidicap-st-share-test.ad.lsa-net.de:8080/stshare"class="list-group-item list-group-item-action list-group-item-light"
+           style="color:#0645AD"><strong>Fileshare</strong></a>
+        </p>
+      </div>
+    </div>
+    <p class="small" style="margin-top: 2.5em;">KIDICAP Version 19.1 Update 5</p>
+  </div>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/tether.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+</body>
+</html>

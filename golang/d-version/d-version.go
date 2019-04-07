@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,6 +22,7 @@ const (
 	comandSearchElement   = "span[class=\"releaseInformation\"]"
 )
 
+// Struct to represent the configuration
 type configuration struct {
 	RemoteVersionURL  string
 	CurrentVersionURL string
@@ -48,22 +48,56 @@ func readConfig(configurationFilename string) configuration {
 	return configuration
 }
 
-func getVersionFromURL(currentVersionURL, searchElement, searchString string) string {
-	var currentVersion string
+// Set version to given pointer for the given version URL.
+func getVersionFromURLWithChan(versionURL, searchElement string, version *string, c chan string) {
+	collector := colly.NewCollector()
+	collector.OnHTML(searchElement, func(e *colly.HTMLElement) {
+		*version = (strings.TrimSpace(e.Text))
+	})
+
+	collector.Visit(versionURL)
+
+	c <- "Done"
+}
+
+// Returns version for the given version URL.
+func getVersionFromURL(versionURL, searchElement string) string {
+	var version string
 
 	collector := colly.NewCollector()
 	collector.OnHTML(searchElement, func(e *colly.HTMLElement) {
-		currentVersion = e.Text
+		version = strings.TrimSpace(e.Text)
 	})
 
-	collector.Visit(currentVersionURL)
+	collector.Visit(versionURL)
 
-	return strings.TrimSpace(currentVersion)
-
+	return version
 }
 
-func getVersionFromFile(fileName, searchElement, searchString string) string {
-	var currentVersion string
+// Set version to given pointer for the given file file name.
+func getVersionFromFileWithChan(fileName, searchElement string, version *string, c chan string) {
+	dir, _ := filepath.Split(fileName)
+
+	fileTransport := &http.Transport{}
+	fileTransport.RegisterProtocol("file", http.NewFileTransport(http.Dir(dir)))
+
+	collector := colly.NewCollector()
+	collector.WithTransport(fileTransport)
+	collector.OnHTML(searchElement, func(e *colly.HTMLElement) {
+		*version = strings.TrimSpace(e.Text)
+	})
+
+	err := collector.Visit("file://" + fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c <- "Done"
+}
+
+// Returns version from given file name.
+func getVersionFromFile(fileName, searchElement string) string {
+	var version string
 
 	dir, _ := filepath.Split(fileName)
 
@@ -73,7 +107,7 @@ func getVersionFromFile(fileName, searchElement, searchString string) string {
 	collector := colly.NewCollector()
 	collector.WithTransport(fileTransport)
 	collector.OnHTML(searchElement, func(e *colly.HTMLElement) {
-		currentVersion = e.Text
+		version = strings.TrimSpace(e.Text)
 	})
 
 	err := collector.Visit("file://" + fileName)
@@ -81,9 +115,11 @@ func getVersionFromFile(fileName, searchElement, searchString string) string {
 		log.Fatal(err)
 	}
 
-	return strings.TrimSpace(currentVersion)
+	return version
 }
 
+// Updates the version in the given file name. Reads the file, replaces the
+// old version with the new one.
 func updateCurrentVersion(fileName, oldVersion, newVersion string) {
 	bytes, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -92,7 +128,6 @@ func updateCurrentVersion(fileName, oldVersion, newVersion string) {
 
 	fileContent := string(bytes)
 	updatedFileContent := strings.Replace(fileContent, oldVersion, newVersion, 1)
-	fmt.Println(updatedFileContent)
 
 	err = ioutil.WriteFile(fileName, []byte(updatedFileContent), 0644)
 	if err != nil {
@@ -101,11 +136,22 @@ func updateCurrentVersion(fileName, oldVersion, newVersion string) {
 }
 
 func main() {
-	//TODO: Test go routines with time
+	var remoteVersion string
+	var currentVersion string
+	c := make(chan string, 2)
+
 	configuration := readConfig(configurationFileName)
-	fmt.Printf("Current Version URL: %v\n", configuration.CurrentVersionURL)
-	// currentVersion := getVersionFromURL(configuration.CurrentVersionURL, overviewSearchElement, configuration.SearchString)
-	// fmt.Printf("Current Version: %v\n", currentVersion)
-	currentVersion := getVersionFromFile(configuration.IndexHTMLFile, overviewSearchElement, configuration.SearchString)
-	fmt.Printf("Current Version: %v\n", currentVersion)
+	if configuration.UseLocal == true {
+		go getVersionFromFileWithChan(configuration.IndexHTMLFile, overviewSearchElement, &currentVersion, c)
+	} else {
+		go getVersionFromURLWithChan(configuration.CurrentVersionURL, overviewSearchElement, &currentVersion, c)
+	}
+	go getVersionFromURLWithChan(configuration.RemoteVersionURL, comandSearchElement, &remoteVersion, c)
+	<-c
+	<-c
+	if remoteVersion != "" && strings.Contains(remoteVersion, configuration.SearchString) {
+		if remoteVersion != currentVersion {
+			updateCurrentVersion(configuration.IndexHTMLFile, currentVersion, remoteVersion)
+		}
+	}
 }

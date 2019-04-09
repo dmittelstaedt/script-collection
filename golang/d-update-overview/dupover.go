@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -129,7 +130,9 @@ func updateCurrentVersion(fileName, oldVersion, newVersion string) {
 	fileContent := string(bytes)
 	updatedFileContent := strings.Replace(fileContent, oldVersion, newVersion, 1)
 
-	err = ioutil.WriteFile(fileName, []byte(updatedFileContent), 0644)
+	info, err := os.Stat(fileName)
+
+	err = ioutil.WriteFile(fileName, []byte(updatedFileContent), info.Mode())
 	if err != nil {
 		log.Fatal(err)
 	}

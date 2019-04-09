@@ -39,9 +39,12 @@ func readConfig(configurationFilename string) configuration {
 
 	viper.SetConfigName(configurationFilename)
 	viper.AddConfigPath(".")
-	viper.ReadInConfig()
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	err := viper.Unmarshal(&configuration)
+	err = viper.Unmarshal(&configuration)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -56,7 +59,10 @@ func getVersionFromURLWithChan(versionURL, searchElement string, version *string
 		*version = (strings.TrimSpace(e.Text))
 	})
 
-	collector.Visit(versionURL)
+	err := collector.Visit(versionURL)
+	if err != nil {
+		log.Fatal(err, " ", versionURL)
+	}
 
 	c <- "Done"
 }
@@ -70,7 +76,10 @@ func getVersionFromURL(versionURL, searchElement string) string {
 		version = strings.TrimSpace(e.Text)
 	})
 
-	collector.Visit(versionURL)
+	err := collector.Visit(versionURL)
+	if err != nil {
+		log.Fatal(err, " ", versionURL)
+	}
 
 	return version
 }
@@ -90,7 +99,7 @@ func getVersionFromFileWithChan(fileName, searchElement string, version *string,
 
 	err := collector.Visit("file://" + fileName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, " ", fileName)
 	}
 
 	c <- "Done"
@@ -113,7 +122,7 @@ func getVersionFromFile(fileName, searchElement string) string {
 
 	err := collector.Visit("file://" + fileName)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err, " ", fileName)
 	}
 
 	return version
@@ -152,7 +161,7 @@ func main() {
 	go getVersionFromURLWithChan(configuration.RemoteVersionURL, comandSearchElement, &remoteVersion, c)
 	<-c
 	<-c
-	if remoteVersion != "" && strings.Contains(remoteVersion, configuration.SearchString) {
+	if remoteVersion != "" && strings.Contains(remoteVersion, configuration.SearchString) && currentVersion != "" {
 		if remoteVersion != currentVersion {
 			updateCurrentVersion(configuration.IndexHTMLFile, currentVersion, remoteVersion)
 		}

@@ -23,6 +23,8 @@ const (
 	comandSearchElement   = "span[class=\"releaseInformation\"]"
 )
 
+var execDir string
+
 // Struct to represent the configuration
 type configuration struct {
 	RemoteVersionURL  string
@@ -32,18 +34,27 @@ type configuration struct {
 	UseLocal          bool
 }
 
+// execDir sets the directory where the executable is located
+func setExecDir() {
+	exec, err := os.Executable()
+	if err != nil {
+		log.Fatal(err)
+	}
+	execDir = filepath.Dir(exec)
+}
+
 // ReadConfig parses the configuration file and returns a configuration
 // struct.
 func readConfig(configurationFilename string) configuration {
-	var configuration configuration
-
 	viper.SetConfigName(configurationFilename)
+	viper.AddConfigPath(execDir)
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var configuration configuration
 	err = viper.Unmarshal(&configuration)
 	if err != nil {
 		log.Fatal(err)
@@ -151,6 +162,8 @@ func main() {
 	var remoteVersion string
 	var currentVersion string
 	c := make(chan string, 2)
+
+	setExecDir()
 
 	configuration := readConfig(configurationFileName)
 	if configuration.UseLocal == true {
